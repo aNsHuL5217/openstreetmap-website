@@ -33,14 +33,22 @@ $(function () {
     map.touchZoomRotate.disableRotation();
     map.keyboard.disableRotation();
 
+    const users = [];
+
     $("[data-user]").each(function () {
       const user = $(this).data("user");
       if (user.lon && user.lat) {
-        OSM.MapLibre.getMarker({ icon: "dot", color: user.color })
-          .setLngLat([user.lon, user.lat])
-          .setPopup(OSM.MapLibre.getPopup(user.description))
-          .addTo(map);
+        users.push(user);
       }
+    });
+
+    users.sort((a, b) => b.lat - a.lat);
+
+    users.forEach(function (user) {
+      OSM.MapLibre.getMarker({ icon: "dot", color: user.color })
+        .setLngLat([user.lon, user.lat])
+        .setPopup(OSM.MapLibre.getPopup(user.description))
+        .addTo(map);
     });
   }
 });
