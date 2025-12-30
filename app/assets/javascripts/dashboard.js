@@ -1,4 +1,4 @@
- //= require maplibre.map
+//= require maplibre.map
 //= require maplibre.i18n
 //= require maplibre.combinedcontrolgroup
 
@@ -13,7 +13,7 @@ $(function () {
       attributionControl: false,
       locale: OSM.MapLibre.Locale,
       rollEnabled: false,
-      dragRotate: true,
+      dragRotate: false,
       pitchWithRotate: false,
       bearingSnap: 180,
       maxPitch: 0,
@@ -33,7 +33,6 @@ $(function () {
     map.touchZoomRotate.disableRotation();
     map.keyboard.disableRotation();
 
-    
     const markerObjects = [];
 
     $("[data-user]").each(function () {
@@ -42,42 +41,32 @@ $(function () {
         const lat = parseFloat(user.lat);
         const lon = parseFloat(user.lon);
 
-       
-        const marker = OSM.MapLibre.getMarker({ 
-          icon: "dot", 
-          color: user.color 
+        const marker = OSM.MapLibre.getMarker({
+          icon: "dot",
+          color: user.color
         })
           .setLngLat([lon, lat])
           .setPopup(OSM.MapLibre.getPopup(user.description))
           .addTo(map);
 
-        
         markerObjects.push({ marker: marker, lat: lat, lon: lon });
       }
     });
 
-    
     const updateZIndex = () => {
       markerObjects.forEach((item) => {
-        
         const point = map.project([item.lon, item.lat]);
-        
-        
         const zIndex = Math.round(point.y);
-        
-        
         item.marker.getElement().style.zIndex = zIndex;
       });
     };
 
-    
     if (markerObjects.length > 0) {
       map.on("move", updateZIndex);
-      map.on("rotate", updateZIndex); 
+      map.on("rotate", updateZIndex);
       map.on("pitch", updateZIndex);
-      
-      
-      updateZIndex(); 
+      updateZIndex();
     }
   }
 });
+
