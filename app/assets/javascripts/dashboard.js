@@ -33,31 +33,29 @@ $(function () {
     map.touchZoomRotate.disableRotation();
     map.keyboard.disableRotation();
 
-    const markerObjects = [];
-
-    $("[data-user]").each(function () {
-      const user = $(this).data("user");
-      if (user.lon && user.lat) {
-        const lat = parseFloat(user.lat);
-        const lon = parseFloat(user.lon);
+    const markerObjects = $("[data-user]")
+      .map(function () {
+        const user = $(this).data("user");
+        if (!user.lon || !user.lat) return null;
 
         const marker = OSM.MapLibre.getMarker({
           icon: "dot",
           color: user.color
         })
-          .setLngLat([lon, lat])
+          .setLngLat([user.lon, user.lat])
           .setPopup(OSM.MapLibre.getPopup(user.description))
           .addTo(map);
 
-        markerObjects.push({ marker: marker, lat: lat, lon: lon });
-      }
-    });
-
+        return { marker: marker, lat: user.lat, lon: user.lon };
+      })
+      .get();
     const updateZIndex = () => {
       markerObjects.forEach((item) => {
-        const point = map.project([item.lon, item.lat]);
-        const zIndex = Math.round(point.y);
-        item.marker.getElement().style.zIndex = zIndex;
+        item.currentY = map.project([item.lon, item.lat]).y;
+      });
+      markerObjects.sort((a, b) => a.currentY - b.currentY);
+      markerObjects.forEach((item, index) => {
+        item.marker.getElement().style.zIndex = index;
       });
     };
 
