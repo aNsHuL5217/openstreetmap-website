@@ -36,19 +36,22 @@ $(function () {
     const markerObjects = $("[data-user]")
       .map(function () {
         const user = $(this).data("user");
-        if (!user.lon || !user.lat) return null;
+        const { lat, lon } = user;
+
+        if (!lat || !lon) return null;
 
         const marker = OSM.MapLibre.getMarker({
           icon: "dot",
           color: user.color
         })
-          .setLngLat([user.lon, user.lat])
+          .setLngLat([lon, lat])
           .setPopup(OSM.MapLibre.getPopup(user.description))
           .addTo(map);
 
-        return { marker: marker, lat: user.lat, lon: user.lon };
+        return { marker, lat, lon };
       })
       .get();
+
     const updateZIndex = () => {
       markerObjects.forEach((item) => {
         item.currentY = map.project([item.lon, item.lat]).y;
@@ -67,4 +70,3 @@ $(function () {
     }
   }
 });
-
