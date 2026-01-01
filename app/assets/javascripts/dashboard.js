@@ -35,17 +35,12 @@ $(function () {
 
     const markerObjects = $("[data-user]")
       .map(function () {
-        const user = $(this).data("user");
-        const { lat, lon } = user;
+        const { lat, lon, color, description } = $(this).data("user");
 
         if (!lat || !lon) return null;
-
-        const marker = OSM.MapLibre.getMarker({
-          icon: "dot",
-          color: user.color
-        })
+        const marker = OSM.MapLibre.getMarker({ icon: "dot", color })
           .setLngLat([lon, lat])
-          .setPopup(OSM.MapLibre.getPopup(user.description))
+          .setPopup(OSM.MapLibre.getPopup(description))
           .addTo(map);
 
         return { marker, lat, lon };
@@ -53,13 +48,15 @@ $(function () {
       .get();
 
     const updateZIndex = () => {
-      markerObjects.forEach((item) => {
+      for (const item of markerObjects) {
         item.currentY = map.project([item.lon, item.lat]).y;
-      });
+      }
+
       markerObjects.sort((a, b) => a.currentY - b.currentY);
-      markerObjects.forEach((item, index) => {
+
+      for (const [index, item] of markerObjects.entries()) {
         item.marker.getElement().style.zIndex = index;
-      });
+      }
     };
 
     if (markerObjects.length > 0) {
